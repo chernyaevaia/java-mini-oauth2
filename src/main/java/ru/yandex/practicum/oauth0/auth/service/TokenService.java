@@ -9,8 +9,7 @@ import ru.yandex.practicum.oauth0.auth.dto.*;
 import ru.yandex.practicum.oauth0.auth.model.*;
 import ru.yandex.practicum.oauth0.auth.repository.*;
 import ru.yandex.practicum.oauth0.auth.util.JwtUtil;
-import ru.yandex.practicum.oauth0.auth.model.Metrics;
-import ru.yandex.practicum.oauth0.auth.repository.MetricsRepository;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -398,4 +397,16 @@ public class TokenService {
             return status;
         }
     }
+
+    public Object processTokenRequest(TokenRequest request) {
+    if (request.getGrantType() == null) {
+        throw new AuthException("grant_type is required", 400);
+    }
+
+    return switch (request.getGrantType()) {
+        case PASSWORD -> issueTokenPassword(request);
+        case CLIENT_CREDENTIALS -> issueTokenClientCredentials(request);
+        default -> throw new AuthException("unsupported_grant_type", 400);
+    };
+}
 }

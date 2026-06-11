@@ -18,23 +18,13 @@ public class TokenController {
 
     @PostMapping("/token")
     public ResponseEntity<?> token(@RequestBody TokenRequest request) {
-        String grantType = request.getGrantType();
-
-        if ("password".equals(grantType)) {
-            return ResponseEntity.ok(tokenService.issueTokenPassword(request));
-        } else if ("client_credentials".equals(grantType)) {
-            return ResponseEntity.ok(tokenService.issueTokenClientCredentials(request));
-        } else {
-            return ResponseEntity.status(400)
-                .body(Map.of("error", "unsupported_grant_type"));
-        }
+        return ResponseEntity.ok(tokenService.processTokenRequest(request));
     }
 
     @PostMapping("/token/refresh")
     public ResponseEntity<?> refresh(@RequestBody TokenRequest request) {
-        if (!"refresh_token".equals(request.getGrantType())) {
-            return ResponseEntity.status(400)
-                .body(Map.of("error", "invalid_grant_type"));
+        if (request.getGrantType() != GrantType.REFRESH_TOKEN) {
+            return ResponseEntity.badRequest().body(Map.of("error", "invalid_grant_type"));
         }
         return ResponseEntity.ok(tokenService.refreshToken(request));
     }
@@ -48,11 +38,5 @@ public class TokenController {
     @PostMapping("/introspect")
     public ResponseEntity<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) {
         return ResponseEntity.ok(tokenService.introspect(request));
-    }
-
-    @ExceptionHandler(TokenService.AuthException.class)
-    public ResponseEntity<Map<String, String>> handleAuthException(TokenService.AuthException e) {
-        return ResponseEntity.status(e.getStatus())
-            .body(Map.of("error", e.getMessage()));
     }
 }

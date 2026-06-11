@@ -50,11 +50,10 @@ public class TokenIntegrationTest {
         });
     }
 
-
     @Test
     void testPasswordGrantSuccess() {
         TokenRequest request = new TokenRequest();
-        request.setGrantType("password");
+        request.setGrantType(GrantType.PASSWORD);
         request.setUsername("alice");
         request.setPassword("pass");
         request.setClientId("cli-001");
@@ -71,7 +70,7 @@ public class TokenIntegrationTest {
     @Test
     void testPasswordGrantInvalidPassword() {
         TokenRequest request = new TokenRequest();
-        request.setGrantType("password");
+        request.setGrantType(GrantType.PASSWORD);
         request.setUsername("alice");
         request.setPassword("wrongpass");
         request.setClientId("cli-001");
@@ -81,11 +80,10 @@ public class TokenIntegrationTest {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
-
     @Test
     void testClientCredentialsSuccess() {
         TokenRequest request = new TokenRequest();
-        request.setGrantType("client_credentials");
+        request.setGrantType(GrantType.CLIENT_CREDENTIALS);
         request.setClientId("cli-002");
         request.setClientSecret("svc-secret");
         request.setScopes(List.of("payments:read"));
@@ -97,11 +95,10 @@ public class TokenIntegrationTest {
         assertNull(response.getBody().getRefreshToken());
     }
 
-
     @Test
     void testRefreshTokenRotation() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
+        req.setGrantType(GrantType.PASSWORD);
         req.setUsername("alice");
         req.setPassword("pass");
         req.setClientId("cli-001");
@@ -113,7 +110,7 @@ public class TokenIntegrationTest {
         assertNotNull(tokens);
 
         TokenRequest refreshReq = new TokenRequest();
-        refreshReq.setGrantType("refresh_token");
+        refreshReq.setGrantType(GrantType.REFRESH_TOKEN);
         refreshReq.setRefreshToken(tokens.getRefreshToken());
         refreshReq.setClientId("cli-001");
         refreshReq.setClientSecret("secret");
@@ -131,7 +128,7 @@ public class TokenIntegrationTest {
     @Test
     void testRefreshTokenRevocation() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
+        req.setGrantType(GrantType.PASSWORD);
         req.setUsername("alice");
         req.setPassword("pass");
         req.setClientId("cli-001");
@@ -149,7 +146,7 @@ public class TokenIntegrationTest {
         assertEquals(HttpStatus.OK, revokeResp.getStatusCode());
 
         TokenRequest refreshReq = new TokenRequest();
-        refreshReq.setGrantType("refresh_token");
+        refreshReq.setGrantType(GrantType.REFRESH_TOKEN);
         refreshReq.setRefreshToken(tokens.getRefreshToken());
         refreshReq.setClientId("cli-001");
         refreshReq.setClientSecret("secret");
@@ -158,11 +155,10 @@ public class TokenIntegrationTest {
         assertEquals(HttpStatus.UNAUTHORIZED, resp.getStatusCode());
     }
 
-
     @Test
     void testAccessTokenRevocation() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
+        req.setGrantType(GrantType.PASSWORD);
         req.setUsername("alice");
         req.setPassword("pass");
         req.setClientId("cli-001");
@@ -182,18 +178,17 @@ public class TokenIntegrationTest {
         IntrospectRequest introspect = new IntrospectRequest();
         introspect.setToken(tokens.getAccessToken());
         ResponseEntity<IntrospectResponse> introRespEntity = restTemplate.postForEntity("/introspect", introspect, IntrospectResponse.class);
-        
+
         assertEquals(HttpStatus.OK, introRespEntity.getStatusCode());
         IntrospectResponse introResp = introRespEntity.getBody();
         assertNotNull(introResp);
         assertFalse(introResp.isActive());
     }
 
-
     @Test
     void testIntrospectionActive() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
+        req.setGrantType(GrantType.PASSWORD);
         req.setUsername("alice");
         req.setPassword("pass");
         req.setClientId("cli-001");
@@ -208,7 +203,7 @@ public class TokenIntegrationTest {
         IntrospectRequest introspect = new IntrospectRequest();
         introspect.setToken(tokens.getAccessToken());
         ResponseEntity<IntrospectResponse> responseEntity = restTemplate.postForEntity("/introspect", introspect, IntrospectResponse.class);
-        
+
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         IntrospectResponse response = responseEntity.getBody();
         assertNotNull(response);
@@ -223,7 +218,7 @@ public class TokenIntegrationTest {
         IntrospectRequest introspect = new IntrospectRequest();
         introspect.setToken("eyJ0eXAiOiJBVCIsImFsZyI6IkhTMjU2In0.eyJleHAiOjF9.signature");
         ResponseEntity<IntrospectResponse> responseEntity = restTemplate.postForEntity("/introspect", introspect, IntrospectResponse.class);
-        
+
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         IntrospectResponse response = responseEntity.getBody();
         assertNotNull(response);
@@ -233,8 +228,8 @@ public class TokenIntegrationTest {
     @Test
     void testInsufficientScope() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
-        req.setUsername("bob"); 
+        req.setGrantType(GrantType.PASSWORD);
+        req.setUsername("bob");
         req.setPassword("secret");
         req.setClientId("cli-001");
         req.setClientSecret("secret");
@@ -244,24 +239,22 @@ public class TokenIntegrationTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
-
     @Test
     void testInvalidSignature() {
         IntrospectRequest introspect = new IntrospectRequest();
         introspect.setToken("abc.def.ghi");
         ResponseEntity<IntrospectResponse> responseEntity = restTemplate.postForEntity("/introspect", introspect, IntrospectResponse.class);
-        
+
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         IntrospectResponse response = responseEntity.getBody();
         assertNotNull(response);
         assertFalse(response.isActive());
     }
 
-
     @Test
     void testTokenHasCorrectScopesForRs() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
+        req.setGrantType(GrantType.PASSWORD);
         req.setUsername("alice");
         req.setPassword("pass");
         req.setClientId("cli-001");
@@ -276,7 +269,7 @@ public class TokenIntegrationTest {
         IntrospectRequest introspect = new IntrospectRequest();
         introspect.setToken(tokens.getAccessToken());
         ResponseEntity<IntrospectResponse> introEntity = restTemplate.postForEntity("/introspect", introspect, IntrospectResponse.class);
-        
+
         assertEquals(HttpStatus.OK, introEntity.getStatusCode());
         IntrospectResponse intro = introEntity.getBody();
         assertNotNull(intro);
@@ -288,7 +281,7 @@ public class TokenIntegrationTest {
     @Test
     void testTokenWithoutWriteScope() {
         TokenRequest req = new TokenRequest();
-        req.setGrantType("password");
+        req.setGrantType(GrantType.PASSWORD);
         req.setUsername("alice");
         req.setPassword("pass");
         req.setClientId("cli-001");
@@ -303,7 +296,7 @@ public class TokenIntegrationTest {
         IntrospectRequest introspect = new IntrospectRequest();
         introspect.setToken(tokens.getAccessToken());
         ResponseEntity<IntrospectResponse> introEntity = restTemplate.postForEntity("/introspect", introspect, IntrospectResponse.class);
-        
+
         assertEquals(HttpStatus.OK, introEntity.getStatusCode());
         IntrospectResponse intro = introEntity.getBody();
         assertNotNull(intro);
