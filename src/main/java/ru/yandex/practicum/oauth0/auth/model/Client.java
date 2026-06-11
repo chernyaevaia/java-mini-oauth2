@@ -1,11 +1,19 @@
 package ru.yandex.practicum.oauth0.auth.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 @Entity
 @Table(name = "clients")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Client {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,22 +36,4 @@ public class Client {
 
     @Column
     private String audience;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getClientId() { return clientId; }
-    public void setClientId(String clientId) { this.clientId = clientId; }
-
-    public String getClientSecretHash() { return clientSecretHash; }
-    public void setClientSecretHash(String clientSecretHash) { this.clientSecretHash = clientSecretHash; }
-
-    public List<String> getAllowedGrants() { return allowedGrants; }
-    public void setAllowedGrants(List<String> allowedGrants) { this.allowedGrants = allowedGrants; }
-
-    public List<String> getAllowedScopes() { return allowedScopes; }
-    public void setAllowedScopes(List<String> allowedScopes) { this.allowedScopes = allowedScopes; }
-
-    public String getAudience() { return audience; }
-    public void setAudience(String audience) { this.audience = audience; }
 }

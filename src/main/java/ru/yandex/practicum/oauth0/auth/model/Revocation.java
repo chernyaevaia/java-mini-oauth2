@@ -1,11 +1,19 @@
 package ru.yandex.practicum.oauth0.auth.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.Instant;
 
 @Entity
 @Table(name = "revocations")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Revocation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,19 +29,4 @@ public class Revocation {
 
     @Column
     private Instant expiresAt;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getTokenId() { return tokenId; }
-    public void setTokenId(String tokenId) { this.tokenId = tokenId; }
-
-    public String getTokenType() { return tokenType; }
-    public void setTokenType(String tokenType) { this.tokenType = tokenType; }
-
-    public Instant getRevokedAt() { return revokedAt; }
-    public void setRevokedAt(Instant revokedAt) { this.revokedAt = revokedAt; }
-
-    public Instant getExpiresAt() { return expiresAt; }
-    public void setExpiresAt(Instant expiresAt) { this.expiresAt = expiresAt; }
 }
